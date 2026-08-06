@@ -1,0 +1,26 @@
+# Virtual environment
+pandg/
+
+# Python bytecode / cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment variables / secrets
+.env
+*.env
+
+# OS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
