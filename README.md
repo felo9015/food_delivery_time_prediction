@@ -14,3 +14,7 @@ source pandg/bin/activate
 # Instalar dependencias
 pip install -r requirements.txt
 ```
+
+## Cómo está organizado este repo
+
+Los notebooks `*_exploration.ipynb` son el espacio de prueba y error; el resto del código y los reportes `.md` son los entregables finales, limpios y documentados. Ver [CONVENTIONS.md](CONVENTIONS.md) para el detalle.
