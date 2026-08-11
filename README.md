@@ -1,20 +1,20 @@
 # Food Delivery Time Prediction
 
-Predicción de tiempo de entrega para una plataforma de delivery, desarrollado como prueba técnica de Data Science.
+Delivery time prediction for a food delivery platform, developed as a Data Science technical assessment.
 
-## Setup del ambiente
+## Environment setup
 
 ```bash
-# Crear el ambiente virtual
+# Create the virtual environment
 python -m venv pandg
 
-# Activar el ambiente (macOS/Linux)
+# Activate the environment (macOS/Linux)
 source pandg/bin/activate
 
-# Instalar dependencias
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-## Cómo está organizado este repo
+## How this repo is organized
 
-Los notebooks `*_exploration.ipynb` son el espacio de prueba y error; el resto del código y los reportes `.md` son los entregables finales, limpios y documentados. Ver [CONVENTIONS.md](CONVENTIONS.md) para el detalle.
+The `*_exploration.ipynb` notebooks are the trial-and-error workspace; the rest of the code and the `.md` reports are the final, clean, documented deliverables. See [CONVENTIONS.md](CONVENTIONS.md) for details.

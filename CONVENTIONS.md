@@ -1,8 +1,8 @@
-# Convenciones del repo
+# Repo conventions
 
-Este proyecto separa el **proceso de trabajo** del **entregable final**:
+This project separates the **working process** from the **final deliverable**:
 
-- Los notebooks `*_exploration.ipynb` (`sql/sql_exploration.ipynb`, `notebooks/eda_exploration.ipynb`, `notebooks/model_exploration.ipynb`, `api/api_exploration.ipynb`) son el espacio de prueba y error: ahí se explora, se prueban hipótesis, se comparan alternativas y se documenta el razonamiento paso a paso.
-- `sql/sql_queries.sql`, `model_pipeline/`, `api/main.py`, y los reportes en `.md` (`EDA_report.md`, `model_notes.md`, `explainability.md`, `error_insights.md`, `strategic_reflections.md`, `sql/sql_insights.md`) son los entregables finales: código o conclusiones ya limpios, pulidos y documentados, sin el ruido del proceso exploratorio.
+- The `*_exploration.ipynb` notebooks (`sql/sql_exploration.ipynb`, `notebooks/eda_exploration.ipynb`, `notebooks/model_exploration.ipynb`, `api/api_exploration.ipynb`) are the trial-and-error workspace: this is where exploration happens, hypotheses are tested, alternatives are compared, and reasoning is documented step by step.
+- `sql/sql_queries.sql`, `model_pipeline/`, `api/main.py`, and the `.md` reports (`EDA_report.md`, `model_notes.md`, `explainability.md`, `error_insights.md`, `strategic_reflections.md`, `sql/sql_insights.md`) are the final deliverables: clean, polished, documented code or conclusions, free of exploratory noise.
 
-Esta separación es intencional, no descuido: permite mostrar el proceso completo de análisis y decisión sin ensuciar el entregable formal que se evalúa.
+This separation is intentional, not an oversight: it shows the full analysis and decision-making process without cluttering the formal deliverable being evaluated.
