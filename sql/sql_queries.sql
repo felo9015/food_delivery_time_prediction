@@ -62,9 +62,7 @@ ORDER BY r.area, r.cuisine_type, d.traffic_condition;
 -- considering only those with enough deliveries to trust the average and
 -- who are still active.
 --
--- The prompt names a fixed cutoff ("at least 50 deliveries"). That is
--- replaced here with the same data-driven threshold used for Question 5's
--- minimum-deliveries filter: the delivery count such that 80% of couriers
+-- The cutoff  is considered as a data-driven threshold: the delivery count such that 80% of couriers
 -- have at least that many (the 20th percentile of the per-courier
 -- delivery-count distribution), computed with window functions in the
 -- `ranked`/`threshold` CTEs below instead of a hard-coded number. On the
