@@ -93,6 +93,36 @@ Tuning substantially closes the overfitting gap for both models — most dramati
 
 **The linear baseline remains the strongest candidate.** Tuning closed most of the trees' overfitting gap but did not change the ranking: with 1,000 total rows and a target whose strongest driver (`Distance_km`) is already close to linear, there is limited room for higher-capacity models to find real structure beyond what the linear models capture.
 
+## Selected Model and Production Pipeline
+
+**The baseline linear model (OLS on the 15 preprocessed features, no interactions) is the model selected for production.** It has the lowest test MAE (6.185 min) and lowest AIC among all 5 candidates, and neither the advanced interaction model nor the tuned tree ensembles improve on it enough to justify the added complexity. From this point on, it is the single model used for prediction — see `model_pipeline/train.py` and `model_pipeline/predict.py`.
+
+**Implementation detail.** The production pipeline uses `sklearn.LinearRegression` inside a single `sklearn.Pipeline` (`build_preprocessing_pipeline()` + `LinearRegression()`), not `statsmodels.OLS`. `statsmodels` was the right tool for diagnostics and inference (p-values, confidence intervals, VIF) earlier in this document, but it does not expose a serializable `predict()` interface suited to production use. The two are equivalent as point estimators — refit on the same train/test split, `sklearn.LinearRegression` reproduces the same 6.185 min test MAE already reported for the `statsmodels` baseline.
+
+### Stability Check (5-Fold CV, Before Freezing the Model)
+
+| | MAE (min) |
+|---|---|
+| CV mean (5-fold, training split) | 6.830 |
+| CV std | 0.484 |
+| CV fold range | 6.078 – 7.454 |
+| Test MAE (single 80/20 split) | 6.185 |
+
+A single 80/20 split carries its own estimation variance; the CV check adds a second, independent estimate of expected performance. Here, the test MAE sits below the CV mean and toward the favorable end of the fold range — evidence that the original split was, if anything, on the easier side, not that the CV is unreliable. This makes the CV mean the more conservative estimate of what the model should be expected to achieve on new data, while the test MAE remains a valid single-split confirmation of the same order of magnitude.
+
+### Retraining on 100% of the Data
+
+The production pipeline is refit on the full 1,000-row dataset (not just the 800-row training split) before being serialized. This is documented explicitly because it is easy to misread as inflating the reported performance:
+
+- **The reported metrics stay honest.** Test MAE, test RMSE, AIC, and the CV check above were all computed before the held-out 20% was ever used for fitting — they remain the truthful estimate of how well this approach generalizes.
+- **Refitting on 100% of the data is a separate, justified step.** With a small dataset (1,000 rows) and a low-capacity model (linear regression, 15 features), every additional row helps estimate the coefficients more precisely. Once the 20% test split has served its purpose — validating the approach — there is no further benefit to withholding it permanently from the model that actually goes into production.
+- **The final model's real-world performance is not claimed to be better than what was validated.** Refitting with more data should maintain or modestly improve the true underlying fit, but the performance figures quoted for this model are, and remain, the ones obtained honestly with the held-out split — not a new, untested number from the 100%-data fit.
+
+### Artifact and Scripts
+
+- `model_pipeline/train.py` — end-to-end script: loads the raw data, runs the CV stability check above, refits the final pipeline on 100% of the data, and serializes it to `model_pipeline/artifacts/model.joblib`.
+- `model_pipeline/predict.py` — loads the serialized pipeline and returns a delivery-time prediction for a single raw order, in the same column format as the source dataset.
+
 ## Next Steps
 
-The heteroscedasticity and non-normal residuals from the OLS diagnostics remain unresolved by either linear model. See `explainability.md` for how interpretability is handled across model families, and `error_insights.md` for the error patterns motivating that direction.
+The heteroscedasticity and non-normal residuals from the OLS diagnostics remain unresolved by the selected model. See `explainability.md` for how interpretability is handled across model families, and `error_insights.md` for the error patterns motivating that direction.
