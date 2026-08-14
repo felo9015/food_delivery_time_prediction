@@ -44,10 +44,10 @@ The most notable insight from this project is not a single number but a pattern:
 
 ## 5. Going to Production
 
-Moving this model to production involves several components. Two are prioritized as the concrete next step for this repository, to be implemented as working code rather than only described:
+Moving this model to production involves several components. Two were prioritized as the concrete next step for this repository:
 
-- **Serving layer:** a FastAPI endpoint (`api/main.py`, currently a placeholder) will wrap `predict.py`, validate incoming request payloads against the expected schema using Pydantic models (rejecting, for example, an unrecognized `Weather` category rather than silently mis-encoding it), and load the serialized `model.joblib` once at startup rather than on every request.
-- **Containerization:** a minimal Dockerfile will package the API for consistent deployment.
+- **Serving layer:** a FastAPI endpoint (`api/main.py`) wraps the trained pipeline, validates incoming request payloads against the expected schema using Pydantic models (rejecting, for example, an unrecognized `Weather` category rather than silently mis-encoding it), and loads the serialized `model.joblib` once at startup rather than on every request. Implemented and tested directly against a running server, including a real prediction request, invalid-category rejection, and the automatically generated `/docs` page (`api/README.md`, `api/api.md`).
+- **Containerization:** a minimal Dockerfile packages the API, reusing the same `requirements.txt` and `uvicorn` command already validated outside a container. It follows standard conventions, but it has not been verified by actually building and running the image — Docker is not available in this environment, so this piece is written but unconfirmed, not demonstrated working (`next_steps.md`).
 
 Beyond that, a full production deployment would additionally require:
 
@@ -57,4 +57,4 @@ Beyond that, a full production deployment would additionally require:
 - **Testing:** unit tests on the preprocessing pipeline and integration tests on the API endpoint.
 - **CI/CD:** automated testing and deployment on each change to the pipeline or model.
 
-Given the scope of this project, the serving layer and containerization are planned to be implemented as working code, while versioning, monitoring, logging, and CI/CD are described here rather than built out, since standing up that infrastructure without a real operating environment to run it in would add complexity without adding genuine demonstration value.
+Given the scope of this project, the serving layer is implemented and tested as working code; the Dockerfile is written but its behavior inside an actual container remains unverified; versioning, monitoring, logging, and CI/CD are described here rather than built out, since standing up that infrastructure without a real operating environment to run it in would add complexity without adding genuine demonstration value.

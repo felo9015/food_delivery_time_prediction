@@ -67,4 +67,6 @@ docker build -t delivery-time-api .
 docker run -p 8000:8000 delivery-time-api
 ```
 
-The API is then available at `http://127.0.0.1:8000`, same as running it directly.
+The API should then be available at `http://127.0.0.1:8000`, same as running it directly.
+
+**Not yet verified:** the `Dockerfile` follows standard conventions and reuses the same `requirements.txt` and `uvicorn` command already validated outside a container, but it has not actually been built or run in a container in this environment. Treat it as unverified until confirmed — see `next_steps.md`.
