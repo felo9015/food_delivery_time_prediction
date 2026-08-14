@@ -18,3 +18,12 @@ pip install -r requirements.txt
 ## How this repo is organized
 
 The `*_exploration.ipynb` notebooks are the trial-and-error workspace; the rest of the code and the `.md` reports are the final, clean, documented deliverables. See [CONVENTIONS.md](CONVENTIONS.md) for details.
+
+## Author
+
+This project was created by Andrés Felipe Torres Ramos, PhD.
+
+- Email: af.torresr@gmail.com
+- LinkedIn: [andres-felipe-torres-ramos](https://www.linkedin.com/in/andres-felipe-torres-ramos/)
+
+Happy to connect with anyone interested in discussing this project, or Operations Research and Data Science topics more broadly.
