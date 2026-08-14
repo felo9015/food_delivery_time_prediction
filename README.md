@@ -1,6 +1,6 @@
 # Food Delivery Time Prediction
 
-Delivery time prediction for a food delivery platform, developed as a Data Science technical assessment.
+Delivery time prediction for a food delivery platform: SQL analysis, exploratory data analysis, and a regression pipeline from raw data to a servable prediction.
 
 ## Environment setup
 
