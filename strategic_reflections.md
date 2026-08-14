@@ -20,15 +20,23 @@ Recommended approach: do not assume direct transfer of the trained coefficients.
 
 ## 3. GenAI Disclosure
 
-Generative AI tools (Claude, used for project planning and strategy discussion, and Claude Code for implementation) were used throughout this project — for SQL query construction, exploratory data analysis, preprocessing pipeline design, model training and tuning, SHAP-based explainability, and documentation. Every output was validated empirically rather than accepted at face value:
+Generative AI tools (Claude, used for project planning and strategy discussion, and Claude Code for implementation) were used throughout this project. SQL query construction has its own disclosure in `sql/sql_insights.md`; this section focuses on the EDA and modeling stages, where the specific direction behind each decision — and not just the fact that AI was used — is the relevant part of the disclosure.
 
-- SQL queries were run against synthetic test data before being finalized.
-- The EDA null-value classification (MCAR/MAR) was based on comparing target distributions between null and non-null rows, not assumed.
-- The minimum-delivery threshold used in Part I was changed from an arbitrary fixed value to a data-driven percentile after review.
-- The null-treatment approach was deliberately deferred from the EDA to the modeling pipeline, to avoid data leakage.
+### EDA
+
+- The missingness-mechanism classification (MCAR/MAR/MNAR per column, `EDA_report.md`) followed a specific methodology that was directed rather than left to Claude Code's default judgment: compare `Delivery_Time_min` between null and non-null rows per column, instead of classifying missingness by assumption or by column name alone.
+- The imputation strategy — a constant `"Unknown"` category for `Weather`/`Traffic_Level`/`Time_of_Day` and the median for `Courier_Experience_yrs` — was a specific, directed decision, not Claude Code's default choice.
+- The decision to keep the 6 IQR outliers on `Delivery_Time_min` at the EDA stage, rather than removing or capping them, and to defer that call to the modeling stage, was directed rather than assumed. Its consequence was verified later, independently, in the error analysis (`error_insights.md`): only 1 of the 5 largest test-set errors turned out to be one of those same outliers.
+
+### Model
+
+- **Tuning scope and reasoning:** the requirement not to tune XGBoost, along with the specific argument for why (its train/test MAE gap reflects a capacity mismatch with the training set size, not an under-tuned model), was specified in advance — not a conclusion Claude Code reached and then justified afterward. The same is true for prioritizing capacity-reducing hyperparameters (`max_depth`, `min_samples_leaf`/`min_child_samples`, L1/L2 regularization) over capacity-increasing ones in the Random Forest/LightGBM search space, and for the requirement to report explicitly whether the tuning outcome confirmed or contradicted the hypothesis that added complexity would not improve generalization here.
+- **Production pipeline design:** using `sklearn.LinearRegression` instead of continuing with `statsmodels.OLS`, running a 5-fold CV stability check before freezing the model, and retraining the final pipeline on 100% of the data before serializing it — including the specific requirement to document that the reported metrics remain the ones obtained honestly on the held-out split, not new numbers from the 100%-data fit — were all specified requirements.
+- **SHAP methodology:** the choice of `shap.LinearExplainer` specifically (exact, not approximate, for a linear model) and the required deliverables — a global summary plot cross-checked against the model's own coefficients, plus 2-3 local examples including the single largest test-set error — were specified before any SHAP code was written.
+- **Error analysis scope:** the segmentation variables (`Weather`, `Traffic_Level`, `Distance_km`), and the requirement to explicitly test — and report the outcome of, whichever way it went — the rainy/snowy underestimation hypothesis raised in the EDA, were specified in advance.
+- **Outlier cross-check:** whether the 5 largest test-set errors coincided with the outliers already flagged by the IQR method in the EDA was a check requested directly; it was not something Claude Code had already planned, and it surfaced the finding that only 1 of the 5 did.
+- **Documentation accuracy:** staleness was flagged and correction requested directly on multiple occasions — for example, `explainability.md`'s SHAP plan no longer matched the model that was actually selected, and `model_exploration.ipynb`'s markdown cells had grown too long — rather than Claude Code identifying and fixing these unprompted.
 - Interaction terms inspired by an external paper (Fu, Chi, Zheng & Shen, 2025, *Omega*) were explicitly adapted, not replicated, because the source paper's key variables (driver ID, age, rating) do not exist in this dataset — and the paper's core Deep & Cross Network architecture was deliberately not implemented, for reasons documented in `model_notes.md`.
-- The hypothesis that the model underestimates on rainy days was tested against actual error data rather than assumed true, leading to its rejection and the identification of a different, real bias instead.
-- When checking whether the largest prediction errors matched previously flagged EDA outliers, only 1 of 5 did — the other 4 were documented as an open question rather than forced into an explanation the data didn't support.
 
 ## 4. Your Signature Insight
 
