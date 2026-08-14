@@ -54,6 +54,30 @@ That paper finds value in modeling interactions between driver-specific informat
 
 **The interactions do not earn their added complexity.** By AIC — which explicitly penalizes extra parameters — the baseline is preferred (lower by ≈ 6 points, despite the advanced model fitting the training data slightly better). Test RMSE improves only marginally; test MAE gets slightly worse. Adj. R² moves by less than a hundredth. Of the 12 interaction terms, only 1 (`Courier_Experience_yrs × Weather_Unknown`, p = 0.040) is individually significant, and it involves the originally-missing-data category rather than a real weather condition, making it more plausibly a small-subgroup artifact than a genuine effect. Both models are kept for the record; **the baseline is the stronger candidate to carry forward.**
 
+## Tree-Based Models
+
+Three tree ensembles were trained next — `RandomForestRegressor`, `XGBRegressor`, `LGBMRegressor` — using the same `build_preprocessing_pipeline()` (no scaling needed for trees, but the same validated imputation and encoding, for consistency with the linear models) and the same 15-feature `X_train`/`X_test`, without the interaction terms built for the advanced linear model (trees can learn interactions and nonlinearities on their own). Default, reasonable hyperparameters were used (`n_estimators=100`, a fixed `random_state`, no other tuning) — a hyperparameter search was deliberately left out of this pass. Each model was evaluated with 5-fold cross-validation on the training set (for a sense of stability across subsets) and with `compute_test_metrics` on the held-out test set. AIC is a likelihood-based metric for parametric models and does not apply to tree ensembles, so it is reported as `N/A` for all three.
+
+| Model | CV MAE (mean ± std) | Train MAE | Test MAE | Test RMSE | Train→Test MAE Gap |
+|---|---|---|---|---|---|
+| Random Forest | 7.90 ± 0.59 | 2.95 | 6.92 | 10.03 | 3.97 |
+| XGBoost | 8.73 ± 0.41 | 0.57 | 7.63 | 10.33 | 7.05 |
+| LightGBM | 7.78 ± 0.51 | 3.97 | 7.13 | 9.93 | 3.17 |
+
+**All three overfit, `XGBoost` severely.** Its train MAE (0.57 min) indicates it has essentially memorized the training set, against a test MAE more than 13x larger (7.63 min) — and it also has the worst mean CV MAE, despite the tightest CV std, meaning it overfits consistently across folds rather than unstably. `Random Forest` and `LightGBM` overfit more moderately but still clearly, with train→test MAE gaps of ≈ 3-4 minutes. With only 800 training rows, unregularized default hyperparameters give these ensembles more capacity than the data supports without a validation-driven stopping rule or explicit regularization.
+
+## Model Comparison: All 5 Models
+
+| Model | Test MAE (min) | Test RMSE (min) | AIC | Note |
+|---|---|---|---|---|
+| Baseline (linear) | 6.185 | 9.054 | 6106.94 | Best test MAE and lowest AIC overall |
+| Advanced (interactions) | 6.239 | 9.024 | 6112.96 | Best test RMSE overall, by a razor-thin margin; AIC still favors the baseline |
+| Random Forest | 6.923 | 10.032 | N/A | Best of the 3 tree models; still trails both linear models by ~0.7+ min MAE |
+| XGBoost | 7.626 | 10.327 | N/A | Worst performer overall; most severely overfit |
+| LightGBM | 7.132 | 9.928 | N/A | Second-best tree model; still behind both linear models |
+
+**First-pass conclusion: the linear baseline remains the strongest candidate, and no tree model is a clear enough improvement to justify carrying forward as-is.** This runs against the usual expectation that tree ensembles beat linear models on tabular data, but it is consistent with the reasoning already given above for not using a deep learning architecture: with only 1,000 rows total and a target whose strongest driver (`Distance_km`) is already close to linear (r ≈ 0.78 in the EDA), there is limited room for higher-capacity models to find real structure beyond what the linear models already capture — their extra capacity instead goes toward overfitting, exactly as the train/test gaps above show.
+
 ## Next Steps
 
-Neither model resolves the heteroscedasticity or non-normal residuals found above. Tree-based models (planned next) do not carry the same linearity/normality assumptions and may handle the outlier-driven skew more naturally; see `explainability.md` for how model interpretability will be handled once those are trained, and `error_insights.md` for the error patterns already observed that motivate this direction.
+Neither linear model resolves the heteroscedasticity or non-normal residuals found in the OLS diagnostics. The tree models, which do not carry those same assumptions, currently underperform them on raw defaults — whether a hyperparameter search would close that gap (most plausibly for `Random Forest` or `LightGBM`, the two tree models that overfit the least) is worth deciding together before investing more effort, given the linear models' current lead. See `explainability.md` for how model interpretability will be handled across both model families, and `error_insights.md` for the error patterns already observed that motivate this direction.
