@@ -35,9 +35,15 @@ def build_preprocessing_pipeline() -> ColumnTransformer:
         ("encoder", OrdinalEncoder(categories=ORDINAL_CATEGORIES)),
     ])
 
+    # drop="first" avoids the dummy variable trap: with a constant term already
+    # in the model, encoding every category would make each nominal column's
+    # dummies sum to exactly 1, an exact linear dependency with the intercept
+    # (perfect multicollinearity). Dropping one category per column makes it
+    # the implicit reference level, which is also what makes the remaining
+    # dummy coefficients and p-values interpretable.
     nominal_pipeline = Pipeline([
         ("imputer", SimpleImputer(strategy="constant", fill_value="Unknown")),
-        ("encoder", OneHotEncoder(handle_unknown="ignore")),
+        ("encoder", OneHotEncoder(drop="first", handle_unknown="ignore")),
     ])
 
     return ColumnTransformer([
