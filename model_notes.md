@@ -123,6 +123,6 @@ The production pipeline is refit on the full 1,000-row dataset (not just the 800
 - `model_pipeline/train.py` — end-to-end script: loads the raw data, runs the CV stability check above, refits the final pipeline on 100% of the data, and serializes it to `model_pipeline/artifacts/model.joblib`.
 - `model_pipeline/predict.py` — loads the serialized pipeline and returns a delivery-time prediction for a single raw order, in the same column format as the source dataset.
 
-## Next Steps
+## Related Documentation
 
-The heteroscedasticity and non-normal residuals from the OLS diagnostics remain unresolved by the selected model. See `explainability.md` for how interpretability is handled across model families, and `error_insights.md` for the error patterns motivating that direction.
+The heteroscedasticity and non-normal residuals from the OLS diagnostics were not corrected in this model — `error_insights.md` documents where that shows up in the actual test-set errors, including a direct check of the weather-related hypothesis raised in the EDA. `explainability.md` documents the SHAP-based validation of the coefficients above, both globally and for individual predictions.
