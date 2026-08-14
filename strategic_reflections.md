@@ -24,11 +24,15 @@ Generative AI tools (Claude, used for project planning and strategy discussion, 
 
 ### EDA
 
+**What GenAI was used for:** exploring the raw dataset (null counts, distributions, categorical frequencies), drafting the pandas code and plots behind the missingness analysis, outlier detection, and correlation checks, and organizing and condensing the resulting findings into `EDA_report.md`.
+
 - The missingness-mechanism classification (MCAR/MAR/MNAR per column, `EDA_report.md`) followed a specific methodology that was directed rather than left to Claude Code's default judgment: compare `Delivery_Time_min` between null and non-null rows per column, instead of classifying missingness by assumption or by column name alone.
 - The imputation strategy — a constant `"Unknown"` category for `Weather`/`Traffic_Level`/`Time_of_Day` and the median for `Courier_Experience_yrs` — was a specific, directed decision, not Claude Code's default choice.
 - The decision to keep the 6 IQR outliers on `Delivery_Time_min` at the EDA stage, rather than removing or capping them, and to defer that call to the modeling stage, was directed rather than assumed. Its consequence was verified later, independently, in the error analysis (`error_insights.md`): only 1 of the 5 largest test-set errors turned out to be one of those same outliers.
 
 ### Model
+
+**What GenAI was used for:** implementing the preprocessing pipeline and the baseline/advanced regressions, running and interpreting the OLS diagnostics, implementing and tuning the tree ensembles, building the SHAP-based explainability analysis and the segmented error analysis, and organizing and condensing the resulting findings into `model_notes.md`, `explainability.md`, and `error_insights.md`.
 
 - **Tuning scope and reasoning:** the requirement not to tune XGBoost, along with the specific argument for why (its train/test MAE gap reflects a capacity mismatch with the training set size, not an under-tuned model), was specified in advance — not a conclusion Claude Code reached and then justified afterward. The same is true for prioritizing capacity-reducing hyperparameters (`max_depth`, `min_samples_leaf`/`min_child_samples`, L1/L2 regularization) over capacity-increasing ones in the Random Forest/LightGBM search space, and for the requirement to report explicitly whether the tuning outcome confirmed or contradicted the hypothesis that added complexity would not improve generalization here.
 - **Production pipeline design:** using `sklearn.LinearRegression` instead of continuing with `statsmodels.OLS`, running a 5-fold CV stability check before freezing the model, and retraining the final pipeline on 100% of the data before serializing it — including the specific requirement to document that the reported metrics remain the ones obtained honestly on the held-out split, not new numbers from the 100%-data fit — were all specified requirements.
