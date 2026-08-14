@@ -21,9 +21,9 @@ The `*_exploration.ipynb` notebooks are the trial-and-error workspace; the rest 
 
 ## Author
 
-This project was created by Andrés Felipe Torres Ramos, PhD.
+I'm Andrés Felipe Torres Ramos, PhD — an Operations Research and Data Science practitioner who enjoys digging into problems like this.
 
-- Email: af.torresr@gmail.com
+Feel free to reach out to talk about this project, or about Operations Research and Data Science more broadly — always happy to connect.
+
+- Email: af.torresr90@gmail.com
 - LinkedIn: [andres-felipe-torres-ramos](https://www.linkedin.com/in/andres-felipe-torres-ramos/)
-
-Happy to connect with anyone interested in discussing this project, or Operations Research and Data Science topics more broadly.
